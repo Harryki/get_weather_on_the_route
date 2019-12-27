@@ -2,6 +2,7 @@
 from geopy.distance import geodesic
 from Models import Path, RequestManager
 from collections import deque
+import time
 
 r = RequestManager()
 routes = r.routesFromGoogle(
@@ -43,6 +44,19 @@ if routes:
 
     locations.extend([cur.start, cur.end])
 
-    for location in locations:
-        r.weatherFromHere(location)
+    ##### this was speed test to see if threading actually works #####
+    # start = time.time()
+    # for location in locations:
+    #     data = r.weatherFromHere(location)
+    #     print(data)
+    # end = time.time()
+    # print(end - start)
+
+    # start = time.time()
+    res = r.getWeathers(locations)
+    for location, data in list(res):
+        print(location, data)
+        # pass
+    # end = time.time()
+    # print(end - start)
 

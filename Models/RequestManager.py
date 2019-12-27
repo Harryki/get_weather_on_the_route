@@ -1,4 +1,5 @@
 import requests
+from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 
 
 class RequestManager:
@@ -23,15 +24,18 @@ class RequestManager:
             return self.directionsData["routes"][0]["legs"][0]["steps"]
         return
 
+    def getWeathers(self, locations):
+
+        with PoolExecutor(max_workers=10) as executor:
+            # for number, prime in zip(PRIMES, executor.map(is_prime, PRIMES)):
+            #     print("%d is prime: %s" % (number, prime))
+            return zip(locations, executor.map(self.weatherFromHere, locations))
+
     def weatherFromHere(self, location: (str, str)):
         API_KEY = "ctFcXUL2CUkSABzCO4rhGwxrJlt-Bxx90u2SS1LuN7g"
         URL = "https://weather.ls.hereapi.com/weather/1.0/report.json"
-
         latitude = location[0]
         longitude = location[1]
-        # latitude = "47.643059"
-        # longitude = "-122.196539"
-
         PARAMS = {
             "apiKey": API_KEY,
             "product": "observation",
@@ -39,11 +43,9 @@ class RequestManager:
             "longitude": longitude,
             "oneobservation": "true",
         }
-        # p1 = (47.643059, -122.196539)
-        # p2 = (47.632880, -122.185400)
-
         r = requests.get(url=URL, params=PARAMS)
-        print(r.json())
+        if r.ok:
+            return r.json()
 
     # defining a params dict for the parameters to be sent to the API
 
