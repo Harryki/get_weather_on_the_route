@@ -3,6 +3,7 @@ from geopy.distance import geodesic
 from Models import Path, RequestManager
 from collections import deque
 import time
+import json
 
 r = RequestManager()
 routes = r.routesFromGoogle(
@@ -55,7 +56,8 @@ if routes:
     # start = time.time()
     res = r.getWeathers(locations)
     for location, data in list(res):
-        print(location, data)
+        # print(location, data)
+        print(json.dumps(data, sort_keys=True, indent=4, separators=(",", ": ")))
         # pass
     # end = time.time()
     # print(end - start)

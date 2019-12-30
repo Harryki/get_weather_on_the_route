@@ -25,7 +25,6 @@ class RequestManager:
         return
 
     def getWeathers(self, locations):
-
         with PoolExecutor(max_workers=10) as executor:
             # for number, prime in zip(PRIMES, executor.map(is_prime, PRIMES)):
             #     print("%d is prime: %s" % (number, prime))
