@@ -1,5 +1,6 @@
 import requests
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
+import settings
 
 
 class RequestManager:
@@ -12,11 +13,9 @@ class RequestManager:
         # api-endpoint
         URL = "https://maps.googleapis.com/maps/api/directions/json"
         PARAMS = {
-            # "origin": "10715 NE 37th ct, Kirkland, WA 98033",
-            # "destination": "Mt Baker Hwy, Deming, WA 98244",
             "origin": origin,
             "destination": destination,
-            "key": "AIzaSyBfLoWx-WoRR0CXlcaBfAN0zRzEXFrf21Y",
+            "key": settings.GOOGLE_DIRECTION_API_KEY,
         }
         r = requests.get(url=URL, params=PARAMS)
         self.directionsData = r.json()
@@ -25,18 +24,16 @@ class RequestManager:
         return
 
     def getWeathers(self, locations):
+        # this will enable multithreading
         with PoolExecutor(max_workers=10) as executor:
-            # for number, prime in zip(PRIMES, executor.map(is_prime, PRIMES)):
-            #     print("%d is prime: %s" % (number, prime))
             return zip(locations, executor.map(self.weatherFromHere, locations))
 
     def weatherFromHere(self, location: (str, str)):
-        API_KEY = "ctFcXUL2CUkSABzCO4rhGwxrJlt-Bxx90u2SS1LuN7g"
         URL = "https://weather.ls.hereapi.com/weather/1.0/report.json"
         latitude = location[0]
         longitude = location[1]
         PARAMS = {
-            "apiKey": API_KEY,
+            "apiKey": settings.HERE_API,
             "product": "observation",
             "latitude": latitude,
             "longitude": longitude,
