@@ -1,9 +1,10 @@
-# import requests
 from geopy.distance import geodesic
 from Models import Path, RequestManager
 from collections import deque
-import time
+
 import json
+
+# import time
 
 r = RequestManager()
 routes = r.routesFromGoogle(

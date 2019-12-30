@@ -2,7 +2,7 @@ import requests
 from geopy.distance import geodesic
 from xml.etree import ElementTree
 import html2text
-from Models import Path
+from Models import Path, RequestManager
 
 route_map = {
     "WA-542": "Mt. Baker Hwy SR542",
@@ -15,33 +15,18 @@ rss_map = {
 }
 
 
-# api-endpoint
-URL = "https://maps.googleapis.com/maps/api/directions/json"
-
-# defining a params dict for the parameters to be sent to the API
-PARAMS = {
-    "origin": "10715 NE 37th ct, Kirkland, WA 98033",
-    "destination": "Mt Baker Hwy, Deming, WA 98244",
-    "key": "AIzaSyBfLoWx-WoRR0CXlcaBfAN0zRzEXFrf21Y",
-}
-
 mtBaker = (48.859200, -121.662235)
-radius = 30.0
+RADIUS = 30.0
 
-# sending get request and saving the response as response object
-r = requests.get(url=URL, params=PARAMS)
 
-# extracting data in json format
-data = r.json()
-# print(r.request.url)
-
-if data["status"] == "OK":
-    routes = data["routes"]
+r = RequestManager()
+routes = r.routesFromGoogle(
+    "10715 NE 37th ct, Kirkland, WA 98033", "48.85627,-121.6691"
+)
+if routes:
     steps_html = []
-    # print("Summary:", routes[0]["summary"])
 
-    for step in routes[0]["legs"][0]["steps"]:
-        # init path object
+    for step in routes:
         start = (step["start_location"]["lat"], step["start_location"]["lng"])
         end = (step["end_location"]["lat"], step["end_location"]["lng"])
         description = step["html_instructions"]
@@ -50,14 +35,12 @@ if data["status"] == "OK":
 
         # append it to the stack
         steps_html.append(p)
-
     while steps_html:
         p = steps_html.pop()
         milesFromMountain = geodesic(mtBaker, p.start).miles
         roadName = ""
-        if milesFromMountain <= 30:
+        if milesFromMountain <= RADIUS:
             bar = p.description.split("<b>")
-            # print(bar)
             for key in route_map.keys():
                 for b in bar:
                     if key in b:
@@ -76,7 +59,3 @@ if data["status"] == "OK":
                 for i in list(item):
                     if i.tag == "description":
                         print(html2text.html2text(i.text))
-
-else:
-    print("not ok")
-

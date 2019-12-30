@@ -46,5 +46,3 @@ class RequestManager:
         if r.ok:
             return r.json()
 
-    # defining a params dict for the parameters to be sent to the API
-
