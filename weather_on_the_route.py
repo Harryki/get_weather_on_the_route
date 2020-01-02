@@ -7,8 +7,10 @@ import json
 # import time
 
 r = RequestManager()
+# accept origin and destination as input
 routes = r.routesFromGoogle(
-    "10715 NE 37th ct, Kirkland, WA 98033", "48.85627,-121.6691"
+    "Kirkland Library",
+    "Alki Beach",
 )
 if routes:
     steps_html = deque()
@@ -38,13 +40,19 @@ if routes:
         THRESHOLD = 20.0
         if singleDistance >= THRESHOLD:  # IMPROVE: add altitude as a condition
             midPoints = cur.getMidPoints(THRESHOLD)
+            # print("midpoint added")
             locations.extend(midPoints)
 
         if distance >= THRESHOLD:
+            # print("new  cur point")
             prev = cur
             locations.append(cur.start)
-
-    locations.extend([cur.start, cur.end])
+    # if cur.start ~ cur.end is bigger than thresh hold, add end as well
+    # locations.extend([cur.start, cur.end])
+    if singleDistance >= THRESHOLD:
+        locations.extend([cur.start, cur.end])
+    else:
+        locations.extend([cur.start])
 
     ##### this was speed test to see if threading actually works #####
     # start = time.time()
@@ -55,10 +63,20 @@ if routes:
     # print(end - start)
 
     # start = time.time()
+
+    print("***** Here's Weather Report *****\n")
     res = r.getWeathers(locations)
     for location, data in list(res):
-        # print(location, data)
-        print(json.dumps(data, sort_keys=True, indent=4, separators=(",", ": ")))
+        res_location = (
+            data["observations"]["location"][0]["latitude"],
+            data["observations"]["location"][0]["longitude"],
+        )
+        print(location, res_location)
+        print(data["observations"]["location"][0]["observation"][0]["description"])
+        print()
+        # print(json.dumps(data, sort_keys=True, indent=4, separators=(",", ": ")))
+        # print(location)
+
         # pass
     # end = time.time()
     # print(end - start)
