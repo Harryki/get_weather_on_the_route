@@ -21,7 +21,7 @@ class RequestManager:
         self.directionsData = r.json()
         if self.directionsData["status"] == "OK":
             return self.directionsData["routes"][0]["legs"][0]["steps"]
-        return
+        return  # return error message?
 
     def getWeathers(self, locations):
         # this will enable multithreading
