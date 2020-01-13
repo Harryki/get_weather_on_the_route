@@ -16,29 +16,27 @@ def hello_world(request):
         return f"Hello World!"
 
 
-def get_weathers_on_the_route(request=None, res):
-    if request.method == 'OPTIONS':
+def get_weathers_on_the_route(request=None):
+    if request.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
         headers = {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600'
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Max-Age": "3600",
         }
 
-        return ('', 204, headers)
+        return ("", 204, headers)
 
-    headers = {
-        'Access-Control-Allow-Origin': '*'
-    }
+    headers = {"Access-Control-Allow-Origin": "*"}
 
     from geopy.distance import geodesic
     from Models import Path, RequestManager
     from collections import deque
 
     import json
-    
+
     if request is not None:
         # PRODUCTION:
         request_json = request.get_json()
