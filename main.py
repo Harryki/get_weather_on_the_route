@@ -16,13 +16,29 @@ def hello_world(request):
         return f"Hello World!"
 
 
-def get_weathers_on_the_route(request=None):
+def get_weathers_on_the_route(request=None, res):
+    if request.method == 'OPTIONS':
+        # Allows GET requests from any origin with the Content-Type
+        # header and caches preflight response for an 3600s
+        headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600'
+        }
+
+        return ('', 204, headers)
+
+    headers = {
+        'Access-Control-Allow-Origin': '*'
+    }
+
     from geopy.distance import geodesic
     from Models import Path, RequestManager
     from collections import deque
 
     import json
-
+    
     if request is not None:
         # PRODUCTION:
         request_json = request.get_json()
@@ -85,21 +101,8 @@ def get_weathers_on_the_route(request=None):
 
         res = r.getWeathers(locations)
         res_data = [data for location, data in list(res)]
-        return json.dumps(res_data, indent=2)
+        return (json.dumps(res_data, indent=2), 200, headers)
 
-        # for location, data in list(res):
-        #     res_data.append()
-        #     res_location = (
-        #         data["observations"]["location"][0]["latitude"],
-        #         data["observations"]["location"][0]["longitude"],
-        #     )
-        #     print(location, res_location)
-        #     print(
-        #         data["observations"]["location"][0]["observation"][0][
-        #             "description"
-        #         ]
-        #     )
-        #     print()
     else:
         return f"no routes from google"
 
